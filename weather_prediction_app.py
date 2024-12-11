@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
@@ -92,11 +91,6 @@ if st.button("Predict with Best Model"):
     st.write(f"Using Best Model: {best_model_name}")
     st.write(f"R2 Score: {model_results[best_model_name]['R2']}")
 
-    plt.figure(figsize=(10, 6))
-    plt.scatter(range(len(y_test)), y_test, label='True Values', alpha=0.6)
-    plt.scatter(range(len(predictions)), predictions, label='Predictions', alpha=0.6)
-    plt.legend()
-    plt.title("True Values vs Predictions")
-    plt.xlabel("Sample")
-    plt.ylabel("Solar Radiation (W/m^2)")
-    st.pyplot(plt)
+    # Streamlit-native visualization
+    comparison_df = pd.DataFrame({"True Values": y_test.values, "Predictions": predictions})
+    st.line_chart(comparison_df)
