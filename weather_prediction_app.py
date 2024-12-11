@@ -21,7 +21,8 @@ def fetch_weather_data(api_key, city="London"):
         }
         return weather_data
     else:
-        raise Exception("Failed to fetch data from API")
+        st.error("Failed to fetch data from API")
+        return None
 
 # Placeholder for API Key
 API_KEY = "your_api_key_here"
@@ -30,10 +31,15 @@ API_KEY = "your_api_key_here"
 data = []
 for _ in range(1000):  # Simulate 1000 data points
     city_data = fetch_weather_data(API_KEY, city="London")
-    data.append(city_data)
+    if city_data:
+        data.append(city_data)
 
-# Convert to DataFrame
-data_df = pd.DataFrame(data)
+# Convert to DataFrame if data is available
+if data:
+    data_df = pd.DataFrame(data)
+else:
+    st.error("No data fetched from the API. Please check your API key and internet connection.")
+    st.stop()
 
 # 2. Data Preprocessing
 # Feature Engineering (Example: Calculating Air Density)
@@ -74,22 +80,18 @@ for model_name, model in models.items():
 best_model_name = max(model_results, key=lambda x: model_results[x]['R2'])
 best_model = models[best_model_name]
 
-print("Model Evaluation:")
-for model_name, metrics in model_results.items():
-    print(f"{model_name}:")
-    for metric_name, value in metrics.items():
-        print(f"  {metric_name}: {value}")
-
-# 4. Visualization with Streamlit
 st.title("Weather Data Prediction")
 
-# Interactive feature selection
-target_variable = st.selectbox("Select Target Variable", features.columns)
+st.write("## Model Evaluation Results")
+for model_name, metrics in model_results.items():
+    st.write(f"### {model_name}")
+    for metric_name, value in metrics.items():
+        st.write(f"- {metric_name}: {value:.4f}")
 
 if st.button("Predict with Best Model"):
     predictions = best_model.predict(X_test)
     st.write(f"Using Best Model: {best_model_name}")
-    st.write(f"R2 Score: {model_results[best_model_name]['R2']}")
+    st.write(f"R2 Score: {model_results[best_model_name]['R2']:.4f}")
 
     # Streamlit-native visualization
     comparison_df = pd.DataFrame({"True Values": y_test.values, "Predictions": predictions})
